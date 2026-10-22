@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context Vault — macOS Native Experience & Complete User Flow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --window-bg: #ffffff;
+      --sidebar-bg: #f5f5f7;
+      --sidebar-border: rgba(0, 0, 0, 0.08);
+      --text-primary: #1d1d1f;
+      --text-secondary: #86868b;
+      --accent: #0071e3;
+      --item-hover: rgba(0, 0, 0, 0.04);
+      --item-active: rgba(0, 113, 227, 0.12);
+      --item-active-text: #0071e3;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --window-bg: #1e1e20;
+        --sidebar-bg: #18181a;
+        --sidebar-border: rgba(255, 255, 255, 0.08);
+        --text-primary: #f5f5f7;
+        --text-secondary: #98989d;
+        --accent: #2997ff;
+        --item-hover: rgba(255, 255, 255, 0.06);
+        --item-active: rgba(41, 151, 255, 0.2);
+        --item-active-text: #2997ff;
+      }
+    }
+    body {
+      background-color: #d1d5db;
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+    .mac-window {
+      background: var(--window-bg);
+      border-radius: 12px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+    .mac-sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+    }
+    .mac-toolbar {
+      background: var(--sidebar-bg);
+      border-bottom: 1px solid var(--sidebar-border);
+    }
+    .mac-input {
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid transparent;
+      color: var(--text-primary);
+    }
+    @media (prefers-color-scheme: dark) {
+      .mac-input {
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+    .mac-input:focus {
+      background: var(--window-bg);
+      border-color: var(--accent);
+      outline: none;
+    }
+    .flow-step-btn.active {
+      background: #0071e3;
+      color: #ffffff;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-6 flex flex-col items-center justify-center">
+
+  <!-- TOP USER FLOW STEP CONTROLLER (Lets you click through every screen in the journey) -->
+  <div class="mb-6 bg-white/90 dark:bg-black/70 backdrop-blur-md p-1.5 rounded-2xl shadow-lg border border-black/10 dark:border-white/10 flex items-center gap-1.5 select-none z-50">
+    <span class="text-2xs font-semibold uppercase tracking-wider text-zinc-500 px-3 font-mono">User Flow:</span>
+    <button id="btn-flow-1" onclick="showFlow('flow-onboard')" class="flow-step-btn active px-3.5 py-1.5 rounded-xl text-xs text-zinc-700 dark:text-zinc-300 transition-all">
+      1. First-Run Setup
+    </button>
+    <button id="btn-flow-2" onclick="showFlow('flow-main')" class="flow-step-btn px-3.5 py-1.5 rounded-xl text-xs text-zinc-700 dark:text-zinc-300 transition-all">
+      2. Main Window (Search & Recall)
+    </button>
+    <button id="btn-flow-3" onclick="showFlow('flow-hud')" class="flow-step-btn px-3.5 py-1.5 rounded-xl text-xs text-zinc-700 dark:text-zinc-300 transition-all">
+      3. Global HUD (Spotlight)
+    </button>
+    <button id="btn-flow-4" onclick="showFlow('flow-settings')" class="flow-step-btn px-3.5 py-1.5 rounded-xl text-xs text-zinc-700 dark:text-zinc-300 transition-all">
+      4. Settings & Privacy (⌘,)
+    </button>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SCREEN 1: FIRST-RUN SETUP / ONBOARDING (Clean macOS Sheet) -->
+  <!-- ======================================================== -->
+  <div id="flow-onboard" class="flow-screen mac-window w-full max-w-lg p-8 flex flex-col items-center text-center space-y-6">
+    <!-- App App Icon -->
+    <div class="w-16 h-16 rounded-2xl bg-gradient-to-b from-blue-500 to-blue-600 shadow-md flex items-center justify-center text-white font-bold text-2xl">
+      <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+    </div>
+
+    <div>
+      <h2 class="text-xl font-bold tracking-tight text-[var(--text-primary)]">Welcome to Context Vault</h2>
+      <p class="text-xs text-[var(--text-secondary)] mt-1.5 max-w-sm leading-relaxed">
+        Your private personal memory engine. Search and recall your past emails, notes, and messages completely on your Mac.
+      </p>
+    </div>
+
+    <!-- Onboarding Step List -->
+    <div class="w-full text-left space-y-3 bg-black/[0.02] dark:bg-white/[0.03] p-4 rounded-xl border border-[var(--sidebar-border)]">
+      <!-- Step 1: Connect Source -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-[var(--text-primary)]">Connect Gmail</div>
+            <div class="text-2xs text-[var(--text-secondary)]">Read-only via official Google sign-in</div>
+          </div>
+        </div>
+        <button class="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-500">Connect</button>
+      </div>
+
+      <hr class="border-[var(--sidebar-border)]">
+
+      <!-- Step 2: Notes Folder -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-[var(--text-primary)]">Select Notes Folder</div>
+            <div class="text-2xs text-[var(--text-secondary)]">Obsidian, Markdown, or text files</div>
+          </div>
+        </div>
+        <button class="px-3 py-1 bg-black/5 dark:bg-white/10 text-[var(--text-primary)] rounded-lg text-xs font-medium hover:bg-black/10">Choose…</button>
+      </div>
+    </div>
+
+    <!-- Security Guarantee Badge -->
+    <div class="flex items-center gap-2 text-2xs text-[var(--text-secondary)]">
+      <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      <span>Zero cloud tracking. All files encrypted with Mac Keychain.</span>
+    </div>
+
+    <!-- Continue Button -->
+    <button onclick="showFlow('flow-main')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl shadow-md transition-all">
+      Open Vault
+    </button>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SCREEN 2: MAIN WINDOW (Standard macOS 3-Pane Notes Style)-->
+  <!-- ======================================================== -->
+  <div id="flow-main" class="flow-screen hidden mac-window w-full max-w-5xl h-[620px] flex flex-col">
+    
+    <!-- Window Toolbar (Pure macOS Style) -->
+    <div class="h-12 mac-toolbar px-4 flex items-center justify-between shrink-0 select-none">
+      <div class="flex items-center gap-4">
+        <!-- Traffic lights -->
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]"></div>
+          <div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]"></div>
+          <div class="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]"></div>
+        </div>
+
+        <!-- Sidebar Toggle -->
+        <button class="p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-secondary)]">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+        </button>
+
+        <span class="text-xs font-semibold text-[var(--text-primary)]">All Personal Memories</span>
+      </div>
+
+      <!-- Center Search Field (Spotlight integrated) -->
+      <div class="w-72">
+        <div class="relative">
+          <svg class="w-3.5 h-3.5 text-[var(--text-secondary)] absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input 
+            type="text" 
+            value="Sarah redesign pricing" 
+            class="w-full mac-input rounded-lg pl-8 pr-3 py-1 text-xs" 
+            placeholder="Search memory..."
+          />
+        </div>
+      </div>
+
+      <!-- Right Toolbar Tools -->
+      <div class="flex items-center gap-2 text-xs">
+        <button onclick="showFlow('flow-hud')" class="px-2 py-1 bg-black/5 dark:bg-white/10 rounded text-2xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+          Open HUD (⌘Space)
+        </button>
+        <button onclick="showFlow('flow-settings')" class="p-1 rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3-Pane Body: Sidebar | Match List | Detail View -->
+    <div class="flex-1 flex overflow-hidden">
+      
+      <!-- 1. LEFT SIDEBAR: Folders / Sources (180px) -->
+      <aside class="w-48 mac-sidebar p-2 flex flex-col justify-between shrink-0 select-none">
+        <div class="space-y-4">
+          <div>
+            <div class="px-2 py-1 text-2xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Vaults</div>
+            <nav class="space-y-0.5 mt-1">
+              <a href="#" class="flex items-center gap-2 px-2 py-1.5 rounded-md bg-[var(--item-active)] text-[var(--item-active-text)] font-semibold text-xs">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                All Sources
+              </a>
+              <a href="#" class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-[var(--item-hover)] text-[var(--text-primary)] text-xs transition-colors">
+                <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Gmail
+              </a>
+              <a href="#" class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-[var(--item-hover)] text-[var(--text-primary)] text-xs transition-colors">
+                <svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Obsidian Notes
+              </a>
+              <a href="#" class="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-[var(--item-hover)] text-[var(--text-primary)] text-xs transition-colors">
+                <svg class="w-3.5 h-3.5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                Telegram
+              </a>
+            </nav>
+          </div>
+        </div>
+
+        <div class="px-2 py-1 text-2xs text-[var(--text-secondary)] font-mono">
+          14,280 indexed
+        </div>
+      </aside>
+
+      <!-- 2. MIDDLE LIST: Search Matches (260px) -->
+      <section class="w-64 border-r border-[var(--sidebar-border)] flex flex-col shrink-0 select-none">
+        <div class="p-2 border-b border-[var(--sidebar-border)] text-2xs text-[var(--text-secondary)] flex justify-between">
+          <span>Search Results</span>
+          <span>3 found</span>
+        </div>
+
+        <div class="flex-1 overflow-y-auto divide-y divide-[var(--sidebar-border)]">
+          <!-- Item 1 (Selected) -->
+          <div class="p-3 bg-[var(--item-active)] border-l-2 border-[var(--accent)] cursor-pointer">
+            <div class="flex items-center justify-between text-2xs mb-0.5">
+              <span class="font-bold text-[var(--text-primary)]">Sarah Jenkins</span>
+              <span class="text-[var(--text-secondary)]">Mar 14</span>
+            </div>
+            <div class="text-xs font-semibold text-[var(--text-primary)] truncate">SOW Agreement Final</div>
+            <p class="text-2xs text-[var(--text-secondary)] line-clamp-2 mt-1">
+              "The $12,500 total sounds fair with 40/30/30. Let's do $5k upfront..."
+            </p>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="p-3 hover:bg-[var(--item-hover)] cursor-pointer transition-colors">
+            <div class="flex items-center justify-between text-2xs mb-0.5">
+              <span class="font-medium text-[var(--text-primary)]">Projects / Acme.md</span>
+              <span class="text-[var(--text-secondary)]">Mar 18</span>
+            </div>
+            <div class="text-xs font-medium text-[var(--text-primary)] truncate">Milestone 1 Wire Paid</div>
+            <p class="text-2xs text-[var(--text-secondary)] line-clamp-2 mt-1">
+              Invoice #104 ($5,000 deposit) confirmed paid by Acme finance team...
+            </p>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="p-3 hover:bg-[var(--item-hover)] cursor-pointer transition-colors">
+            <div class="flex items-center justify-between text-2xs mb-0.5">
+              <span class="font-medium text-[var(--text-primary)]">Sarah Jenkins Chat</span>
+              <span class="text-[var(--text-secondary)]">Mar 15</span>
+            </div>
+            <div class="text-xs font-medium text-[var(--text-primary)] truncate">Legal team sign-off</div>
+            <p class="text-2xs text-[var(--text-secondary)] line-clamp-2 mt-1">
+              "Sent the contract over to legal, all milestones approved..."
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. RIGHT DETAIL VIEW: Full Content & Recall (Flex-1) -->
+      <main class="flex-1 p-8 overflow-y-auto space-y-6">
+        
+        <!-- Plain English Recall Box (Native Apple style) -->
+        <div class="p-4 rounded-xl bg-[var(--sidebar-bg)] border border-[var(--sidebar-border)] space-y-1.5">
+          <div class="flex items-center justify-between text-xs font-semibold text-[var(--text-primary)]">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              Recall Answer
+            </span>
+            <span class="text-2xs font-normal text-[var(--text-secondary)]">From 2 verified sources</span>
+          </div>
+          <p class="text-xs leading-relaxed text-[var(--text-primary)]">
+            You agreed on a total project price of <strong>$12,500 USD</strong> split 40/30/30 ($5,000 kickoff deposit, $3,750 on prototype demo, $3,750 on final handover).
+          </p>
+        </div>
+
+        <!-- Full Original Email View -->
+        <div class="space-y-3 pt-2">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-[var(--text-primary)]">SOW Agreement Final - Redesign Budget</h3>
+            <span class="text-2xs text-[var(--text-secondary)]">March 14, 2026 at 3:42 PM</span>
+          </div>
+
+          <div class="text-xs text-[var(--text-secondary)] pb-2 border-b border-[var(--sidebar-border)]">
+            From: <strong class="text-[var(--text-primary)]">Sarah Jenkins</strong> &lt;sarah@studio.com&gt;
+          </div>
+
+          <div class="text-xs leading-relaxed text-[var(--text-primary)] space-y-3">
+            <p>Hey,</p>
+            <p>I reviewed the proposal document you sent over this morning. Everything looks solid and covers all our key requirements.</p>
+            
+            <!-- Apple Quote Callout -->
+            <blockquote class="border-l-2 border-[var(--accent)] pl-3 py-1 my-2 text-[var(--text-primary)] font-medium bg-black/[0.02] dark:bg-white/[0.02]">
+              “The $12,500 total sounds fair with 40/30/30. Let's do $5k upfront so you can lock in the April development sprint. Once you send over the deposit invoice, our finance team will release payment within 48 hours.”
+            </blockquote>
+
+            <p>Looking forward to getting this started!</p>
+            <p class="pt-2 text-[var(--text-secondary)]">Best regards,<br>Sarah</p>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SCREEN 3: GLOBAL HUD (Spotlight / Raycast Style Overlay)  -->
+  <!-- ======================================================== -->
+  <div id="flow-hud" class="flow-screen hidden mac-window w-full max-w-xl shadow-2xl overflow-hidden flex flex-col">
+    <!-- Spotlight Input -->
+    <div class="p-4 border-b border-[var(--sidebar-border)] flex items-center gap-3 bg-[var(--window-bg)]">
+      <svg class="w-5 h-5 text-[var(--accent)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input 
+        type="text" 
+        value="Sarah redesign price" 
+        class="w-full bg-transparent text-sm text-[var(--text-primary)] font-medium focus:outline-none"
+        placeholder="Type to recall..."
+      />
+      <span class="text-2xs font-mono text-[var(--text-secondary)] bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded">esc to close</span>
+    </div>
+
+    <!-- Spotlight Direct Answer Preview -->
+    <div class="m-3 p-3.5 bg-black/[0.03] dark:bg-white/[0.04] rounded-xl border border-[var(--sidebar-border)] space-y-1">
+      <div class="text-2xs font-bold uppercase tracking-wider text-[var(--accent)]">Instant Recall</div>
+      <p class="text-xs text-[var(--text-primary)] leading-relaxed">
+        Agreed on <strong>$12,500 total</strong> (40% upfront deposit of $5,000 paid March 18, 30% prototype demo, 30% handover).
+      </p>
+    </div>
+
+    <!-- Spotlight Results List -->
+    <div class="px-2 pb-2 space-y-1 max-h-64 overflow-y-auto text-xs">
+      <div class="p-2.5 rounded-lg bg-[var(--item-active)] text-[var(--text-primary)] flex items-center justify-between cursor-pointer">
+        <div class="flex items-center gap-2">
+          <span class="text-blue-500 font-bold">✉</span>
+          <span class="font-medium">SOW Agreement Final - Sarah Jenkins</span>
+        </div>
+        <span class="text-2xs font-mono text-[var(--text-secondary)]">↵ Copy</span>
+      </div>
+
+      <div class="p-2.5 rounded-lg hover:bg-[var(--item-hover)] text-[var(--text-primary)] flex items-center justify-between cursor-pointer">
+        <div class="flex items-center gap-2">
+          <span class="text-purple-500 font-bold">✎</span>
+          <span class="text-[var(--text-secondary)]">Projects / Acme.md ($5k wire confirmed)</span>
+        </div>
+        <span class="text-2xs font-mono text-[var(--text-secondary)]">Open</span>
+      </div>
+    </div>
+
+    <!-- Spotlight Footer -->
+    <div class="px-4 py-2 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] flex items-center justify-between text-2xs text-[var(--text-secondary)] font-mono">
+      <span>↵ Copy Answer · ⌘↵ Open Main Window · esc Close</span>
+      <span class="text-emerald-500">100% Local</span>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SCREEN 4: MAC SETTINGS WINDOW (Cmd+,)                    -->
+  <!-- ======================================================== -->
+  <div id="flow-settings" class="flow-screen hidden mac-window w-full max-w-lg p-6 space-y-6">
+    <div class="flex items-center justify-between border-b border-[var(--sidebar-border)] pb-3">
+      <h3 class="text-sm font-bold text-[var(--text-primary)]">Settings</h3>
+      <span class="text-2xs text-[var(--text-secondary)] font-mono">v2.0 (Native)</span>
+    </div>
+
+    <!-- Settings Sections -->
+    <div class="space-y-4 text-xs">
+      <!-- General -->
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="font-semibold text-[var(--text-primary)]">Global Shortcut</div>
+          <div class="text-2xs text-[var(--text-secondary)]">Press anywhere to summon Spotlight HUD</div>
+        </div>
+        <span class="font-mono bg-black/5 dark:bg-white/10 px-2 py-1 rounded text-2xs font-bold">⌘ Space</span>
+      </div>
+
+      <hr class="border-[var(--sidebar-border)]">
+
+      <!-- Privacy & Encryption -->
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="font-semibold text-[var(--text-primary)]">Vault Encryption</div>
+          <div class="text-2xs text-[var(--text-secondary)]">AES-256-GCM backed by Mac Keychain</div>
+        </div>
+        <span class="text-emerald-500 font-semibold text-2xs">Active ✓</span>
+      </div>
+
+      <hr class="border-[var(--sidebar-border)]">
+
+      <!-- PII Redaction -->
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="font-semibold text-[var(--text-primary)]">Automatic PII Redactor</div>
+          <div class="text-2xs text-[var(--text-secondary)]">Scrubs phone numbers & banking details locally</div>
+        </div>
+        <input type="checkbox" checked class="rounded text-blue-600">
+      </div>
+
+      <hr class="border-[var(--sidebar-border)]">
+
+      <!-- Storage Management -->
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="font-semibold text-[var(--text-primary)]">Local LanceDB Cache</div>
+          <div class="text-2xs text-[var(--text-secondary)]">14,280 messages (280 MB on disk)</div>
+        </div>
+        <button class="px-2.5 py-1 bg-black/5 dark:bg-white/10 rounded text-2xs hover:bg-black/10">Reindex…</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showFlow(screenId) {
+      document.querySelectorAll('.flow-screen').forEach(s => s.classList.add('hidden'));
+      const target = document.getElementById(screenId);
+      if (target) target.classList.remove('hidden');
+
+      const btnMap = {
+        'flow-onboard': 'btn-flow-1',
+        'flow-main': 'btn-flow-2',
+        'flow-hud': 'btn-flow-3',
+        'flow-settings': 'btn-flow-4'
+      };
+
+      document.querySelectorAll('.flow-step-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(btnMap[screenId]);
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

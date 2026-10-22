@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context Vault — Apple Native Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --sidebar-bg: rgba(246, 246, 246, 0.85);
+      --canvas-bg: #ffffff;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --text-primary: #1d1d1f;
+      --text-secondary: #86868b;
+      --accent-blue: #0071e3;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --sidebar-bg: rgba(30, 30, 32, 0.82);
+        --canvas-bg: #1c1c1e;
+        --border-color: rgba(255, 255, 255, 0.08);
+        --text-primary: #f5f5f7;
+        --text-secondary: #a1a1a6;
+        --accent-blue: #2997ff;
+      }
+    }
+    body {
+      background-color: var(--canvas-bg);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+    .macos-sidebar {
+      background-color: var(--sidebar-bg);
+      backdrop-filter: blur(25px) saturate(190%);
+      -webkit-backdrop-filter: blur(25px) saturate(190%);
+      border-right: 1px solid var(--border-color);
+    }
+    .macos-toolbar {
+      background-color: var(--sidebar-bg);
+      backdrop-filter: blur(25px) saturate(190%);
+      -webkit-backdrop-filter: blur(25px) saturate(190%);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .note-content {
+      user-select: text;
+    }
+    .apple-quote {
+      border-left: 3px solid var(--accent-blue);
+      padding-left: 14px;
+      margin: 16px 0;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+  <!-- Native macOS Window Titlebar / Toolbar -->
+  <header class="h-12 macos-toolbar px-4 flex items-center justify-between shrink-0 select-none">
+    <div class="flex items-center gap-4">
+      <!-- Native Window Controls -->
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]"></div>
+        <div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]"></div>
+        <div class="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]"></div>
+      </div>
+
+      <!-- Segment / View Toggles (Apple Style) -->
+      <div class="flex items-center gap-1 pl-4 border-l border-[var(--border-color)]">
+        <button class="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+        </button>
+        <span class="text-xs font-medium text-[var(--text-primary)]">Sarah Jenkins Redesign</span>
+      </div>
+    </div>
+
+    <!-- Center Search Bar (Subtle, Apple Spotlight feel) -->
+    <div class="w-80">
+      <div class="relative">
+        <svg class="w-3.5 h-3.5 text-[var(--text-secondary)] absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input 
+          type="text" 
+          value="pricing and milestones" 
+          placeholder="Search this vault..." 
+          class="w-full bg-black/5 dark:bg-white/5 border border-transparent rounded-lg pl-8 pr-3 py-1 text-xs text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:border-[var(--accent-blue)] transition-all"
+        />
+      </div>
+    </div>
+
+    <!-- Right Window Actions -->
+    <div class="flex items-center gap-3">
+      <button class="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+      </button>
+      <span class="text-xs text-[var(--text-secondary)] font-medium">Synced</span>
+    </div>
+  </header>
+
+  <!-- Main Body: Apple Notes / Craft Style 2-Column Studio -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- LEFT SIDEBAR: Sources Shelf (Translucent macOS style, no ugly cards) -->
+    <aside class="w-64 macos-sidebar flex flex-col shrink-0 select-none">
+      
+      <!-- Section Header -->
+      <div class="px-4 py-3 flex items-center justify-between">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Sources</span>
+        <button class="text-xs text-[var(--accent-blue)] font-medium hover:underline">+ Add</button>
+      </div>
+
+      <!-- Source Items List (Apple Notes style) -->
+      <nav class="flex-1 overflow-y-auto px-2 space-y-0.5">
+        
+        <!-- Source Item 1 (Selected) -->
+        <div class="px-2.5 py-2 rounded-lg bg-[var(--accent-blue)] text-white flex items-center justify-between cursor-pointer">
+          <div class="flex items-center gap-2.5 truncate">
+            <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <div class="truncate">
+              <div class="text-xs font-medium truncate">Sarah Jenkins Thread</div>
+              <div class="text-[10px] text-white/80">Gmail · 4 emails</div>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono text-white/90">Mar 14</span>
+        </div>
+
+        <!-- Source Item 2 -->
+        <div class="px-2.5 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-primary)] flex items-center justify-between cursor-pointer transition-colors">
+          <div class="flex items-center gap-2.5 truncate">
+            <svg class="w-4 h-4 shrink-0 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <div class="truncate">
+              <div class="text-xs font-medium truncate">Projects / Acme.md</div>
+              <div class="text-[10px] text-[var(--text-secondary)]">Obsidian Note</div>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono text-[var(--text-secondary)]">Mar 18</span>
+        </div>
+
+        <!-- Source Item 3 -->
+        <div class="px-2.5 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-primary)] flex items-center justify-between cursor-pointer transition-colors">
+          <div class="flex items-center gap-2.5 truncate">
+            <svg class="w-4 h-4 shrink-0 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <div class="truncate">
+              <div class="text-xs font-medium truncate">Telegram Chat Export</div>
+              <div class="text-[10px] text-[var(--text-secondary)]">34 messages</div>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono text-[var(--text-secondary)]">Mar 15</span>
+        </div>
+
+      </nav>
+
+      <!-- Bottom System Status -->
+      <div class="p-3 border-t border-[var(--border-color)] text-[11px] text-[var(--text-secondary)] flex items-center justify-between">
+        <span>3 sources active</span>
+        <span class="text-emerald-500 font-medium">On-Device</span>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT MAIN CANVAS: Clean Document & Synthesis (Like Craft / Apple Notes) -->
+    <main class="flex-1 flex flex-col bg-[var(--canvas-bg)] overflow-hidden">
+      
+      <!-- Document Reading / Writing Area -->
+      <div class="flex-1 overflow-y-auto p-12 max-w-2xl mx-auto w-full note-content space-y-6">
+
+        <!-- Document Date & Meta -->
+        <div class="text-xs text-[var(--text-secondary)]">
+          March 18, 2026 at 3:42 PM · From Sarah Jenkins Thread
+        </div>
+
+        <!-- Document Heading -->
+        <h1 class="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
+          Redesign Scope & Milestones
+        </h1>
+
+        <!-- Natural Document Body (NO FAKE DASHBOARD CARDS) -->
+        <div class="text-[15px] leading-relaxed text-[var(--text-primary)] space-y-4 font-normal">
+          <p>
+            You and Sarah agreed on a total project budget of <strong>$12,500 USD</strong>.
+          </p>
+
+          <p>
+            The project follows a standard 40 / 30 / 30 milestone breakdown:
+          </p>
+
+          <ul class="list-disc list-inside space-y-1.5 pl-2 text-[var(--text-primary)]">
+            <li><strong>Deposit (40%):</strong> $5,000 upfront. Confirmed received via wire on March 18 to lock in the April development sprint.</li>
+            <li><strong>Interactive Prototype (30%):</strong> $3,750 due upon sign-off of the functional demo.</li>
+            <li><strong>Final Handover (30%):</strong> $3,750 due upon code delivery and repository transfer.</li>
+          </ul>
+
+          <!-- Clean Apple Quote Style (No Card Fluff) -->
+          <div class="apple-quote">
+            “The $12,500 total sounds fair with 40/30/30. Let's do $5k upfront so you can lock in the April development sprint.”
+            <div class="text-xs text-[var(--text-secondary)] mt-1 font-medium">
+              — Sarah Jenkins &lt;sarah@studio.com&gt;
+            </div>
+          </div>
+
+          <p class="text-[var(--text-secondary)] text-sm">
+            Next action: Complete the interactive demo before scheduling the milestone 2 review call.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Minimal Bottom Composer (Craft/Notes style) -->
+      <div class="p-4 border-t border-[var(--border-color)] bg-[var(--canvas-bg)] shrink-0">
+        <div class="max-w-2xl mx-auto flex items-center gap-2">
+          <input 
+            type="text" 
+            placeholder="Ask a question about these sources or add a note..."
+            class="flex-1 bg-black/5 dark:bg-white/5 border border-transparent rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:outline-none focus:bg-white dark:focus:bg-black/30 focus:border-[var(--accent-blue)] transition-all"
+          />
+          <button class="bg-[var(--accent-blue)] text-white px-4 py-2 rounded-xl text-xs font-semibold hover:opacity-90 transition-opacity">
+            Send
+          </button>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

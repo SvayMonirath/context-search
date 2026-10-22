@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context Vault — Slack + macOS Native Experience</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --rail-bg: #1e1f24;
+      --sidebar-bg: rgba(243, 243, 245, 0.88);
+      --main-bg: #ffffff;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --text-main: #1d1d1f;
+      --text-muted: #86868b;
+      --accent: #0071e3;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --rail-bg: #141519;
+        --sidebar-bg: rgba(26, 27, 31, 0.85);
+        --main-bg: #1c1d22;
+        --border-color: rgba(255, 255, 255, 0.08);
+        --text-main: #f5f5f7;
+        --text-muted: #98989f;
+        --accent: #2997ff;
+      }
+    }
+    body {
+      background-color: var(--main-bg);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+    .macos-blur {
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+    }
+    .active-rail-item {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+    .active-nav-item {
+      background: var(--accent);
+      color: #ffffff !important;
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+  <!-- macOS System Window Titlebar -->
+  <header class="h-10 bg-[var(--sidebar-bg)] macos-blur border-b border-[var(--border-color)] px-3.5 flex items-center justify-between shrink-0 select-none">
+    <div class="flex items-center gap-3">
+      <!-- Traffic lights -->
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]"></div>
+        <div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]"></div>
+        <div class="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]"></div>
+      </div>
+      <span class="text-xs font-semibold text-[var(--text-main)] ml-2">Context Vault</span>
+    </div>
+
+    <!-- Center Search Bar (Slack + Mac Spotlight Style) -->
+    <div class="w-96">
+      <div class="relative cursor-pointer" onclick="navigateTo('page-search')">
+        <svg class="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input 
+          type="text" 
+          placeholder="Search all emails, chats, and notes (⌘K)..." 
+          class="w-full bg-black/5 dark:bg-white/5 border border-[var(--border-color)] rounded-lg pl-8 pr-12 py-1 text-xs text-[var(--text-main)] placeholder-[var(--text-muted)] focus:outline-none pointer-events-none"
+        />
+        <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono text-[var(--text-muted)] bg-black/5 dark:bg-white/10 px-1.5 py-0.2 rounded">⌘K</span>
+      </div>
+    </div>
+
+    <!-- Right Sync Badge -->
+    <div class="flex items-center gap-2 text-xs font-medium text-[var(--text-muted)]">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span class="text-[11px]">100% On-Device</span>
+    </div>
+  </header>
+
+  <!-- Main Multi-Pane Layout: Slack Left Rail + Collapsible Sidebar + Canvas -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- 1. SLACK-STYLE FAR-LEFT APP RAIL (60px) -->
+    <nav class="w-16 bg-[var(--rail-bg)] flex flex-col items-center py-4 justify-between shrink-0 select-none z-20">
+      <div class="space-y-4 flex flex-col items-center w-full">
+        <!-- Vault Icon -->
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md mb-2">
+          CV
+        </div>
+
+        <!-- Rail Navigation Buttons -->
+        <button id="rail-search" onclick="navigateTo('page-search')" title="Recall & Search" class="w-10 h-10 rounded-xl active-rail-item text-white flex flex-col items-center justify-center gap-0.5 hover:bg-white/10 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </button>
+
+        <button id="rail-channels" onclick="navigateTo('page-channels')" title="Channels & DMs" class="w-10 h-10 rounded-xl text-zinc-400 hover:text-white flex flex-col items-center justify-center gap-0.5 hover:bg-white/10 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg>
+        </button>
+
+        <button id="rail-studio" onclick="navigateTo('page-studio')" title="Synthesis Studio" class="w-10 h-10 rounded-xl text-zinc-400 hover:text-white flex flex-col items-center justify-center gap-0.5 hover:bg-white/10 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </button>
+
+        <button id="rail-connectors" onclick="navigateTo('page-connectors')" title="Data Connectors" class="w-10 h-10 rounded-xl text-zinc-400 hover:text-white flex flex-col items-center justify-center gap-0.5 hover:bg-white/10 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        </button>
+      </div>
+
+      <!-- Rail Footer (Privacy & Settings) -->
+      <div class="space-y-3 flex flex-col items-center">
+        <button id="rail-privacy" onclick="navigateTo('page-privacy')" title="Privacy Vault" class="w-10 h-10 rounded-xl text-emerald-400 hover:bg-white/10 flex items-center justify-center transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- 2. MACOS-STYLE SECONDARY SIDEBAR (220px) -->
+    <aside class="w-56 bg-[var(--sidebar-bg)] macos-blur border-r border-[var(--border-color)] flex flex-col justify-between p-3 select-none shrink-0">
+      <div class="space-y-4">
+        
+        <!-- Channels Section -->
+        <div>
+          <div class="px-2 py-1 flex items-center justify-between text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+            <span>Topics & Vaults</span>
+          </div>
+          <div class="mt-1 space-y-0.5">
+            <button onclick="navigateTo('page-channels')" class="w-full text-left px-2 py-1.5 rounded-md active-nav-item text-xs font-medium flex items-center gap-2">
+              <span class="opacity-80">#</span> agreements
+            </button>
+            <button onclick="navigateTo('page-channels')" class="w-full text-left px-2 py-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-main)] text-xs font-medium flex items-center gap-2 transition-colors">
+              <span class="opacity-50">#</span> travel-trips
+            </button>
+            <button onclick="navigateTo('page-channels')" class="w-full text-left px-2 py-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-main)] text-xs font-medium flex items-center gap-2 transition-colors">
+              <span class="opacity-50">#</span> finance-tax
+            </button>
+          </div>
+        </div>
+
+        <!-- DMs / People Section -->
+        <div>
+          <div class="px-2 py-1 flex items-center justify-between text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+            <span>Correspondents</span>
+          </div>
+          <div class="mt-1 space-y-0.5">
+            <button onclick="navigateTo('page-channels')" class="w-full text-left px-2 py-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-main)] text-xs flex items-center justify-between transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                Sarah Jenkins
+              </span>
+              <span class="text-[10px] text-[var(--text-muted)] font-mono">4</span>
+            </button>
+            <button onclick="navigateTo('page-channels')" class="w-full text-left px-2 py-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-main)] text-xs flex items-center justify-between transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-zinc-400"></span>
+                Alex Rivera
+              </span>
+              <span class="text-[10px] text-[var(--text-muted)] font-mono">2</span>
+            </button>
+            <button onclick="navigateTo('page-channels')" class="w-full text-left px-2 py-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-main)] text-xs flex items-center justify-between transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-zinc-400"></span>
+                Kenji Sato
+              </span>
+              <span class="text-[10px] text-[var(--text-muted)] font-mono">1</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Vault Stats -->
+      <div class="p-2.5 rounded-lg bg-black/5 dark:bg-white/5 border border-[var(--border-color)] text-[11px] text-[var(--text-muted)] space-y-1">
+        <div class="flex items-center justify-between font-medium text-[var(--text-main)]">
+          <span>Local Storage</span>
+          <span class="font-mono text-[10px]">280 MB</span>
+        </div>
+        <p class="text-[10px] leading-tight">14,280 messages indexed offline in LanceDB.</p>
+      </div>
+    </aside>
+
+    <!-- 3. MAIN WORKSPACE CANVAS (Changes based on selected page) -->
+    <main class="flex-1 flex flex-col bg-[var(--main-bg)] overflow-hidden relative">
+
+      <!-- ============================================== -->
+      <!-- PAGE 1: RECALL & SEARCH HUB (The Daily Engine) -->
+      <!-- ============================================== -->
+      <div id="page-search" class="page-view flex-1 flex flex-col overflow-y-auto p-8 max-w-3xl mx-auto w-full space-y-6">
+        
+        <!-- Search Callout -->
+        <div class="space-y-1">
+          <h2 class="text-xl font-bold tracking-tight text-[var(--text-main)]">Natural Language Recall</h2>
+          <p class="text-xs text-[var(--text-muted)]">Ask anything across your connected Gmail, Telegram, and Obsidian notes.</p>
+        </div>
+
+        <!-- Big Search Bar -->
+        <div class="bg-black/5 dark:bg-white/5 border border-[var(--border-color)] rounded-2xl p-4 focus-within:border-[var(--accent)] transition-all">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-[var(--accent)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input 
+              type="text" 
+              value="What did Sarah and I agree on for the redesign pricing?" 
+              class="w-full bg-transparent text-sm text-[var(--text-main)] font-medium focus:outline-none"
+            />
+            <button class="bg-[var(--accent)] text-white text-xs px-3.5 py-1.5 rounded-lg font-medium shadow-sm hover:opacity-90">
+              Recall
+            </button>
+          </div>
+        </div>
+
+        <!-- Result Card: Clean Apple Native Answer -->
+        <div class="border border-[var(--border-color)] rounded-2xl p-6 bg-black/[0.02] dark:bg-white/[0.02] space-y-4">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span>
+              Verified Synthesis
+            </span>
+            <span class="text-[11px] font-mono text-[var(--text-muted)]">LanceDB Hybrid: 4ms</span>
+          </div>
+
+          <p class="text-sm leading-relaxed text-[var(--text-main)]">
+            You and Sarah agreed on <strong>$12,500 total</strong> split across 3 milestones: 40% deposit ($5,000 upfront), 30% prototype ($3,750), and 30% final code handover ($3,750).
+          </p>
+
+          <!-- Quote Block -->
+          <div class="border-l-2 border-[var(--accent)] pl-3.5 py-1 text-xs text-[var(--text-muted)] italic">
+            “The $12,500 total sounds fair with 40/30/30. Let's do $5k upfront so you can lock in the April development sprint.”
+            <div class="text-[11px] not-italic text-[var(--text-main)] font-medium mt-1">
+              — Sarah Jenkins &lt;sarah@studio.com&gt; · Mar 14, 2026
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PAGE 2: CHANNELS & THREADS (Slack-Style Feed)  -->
+      <!-- ============================================== -->
+      <div id="page-channels" class="page-view hidden flex-1 flex flex-col overflow-hidden">
+        
+        <!-- Channel Header -->
+        <div class="h-13 border-b border-[var(--border-color)] px-6 flex items-center justify-between shrink-0">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-[var(--text-main)]"># agreements</span>
+              <span class="text-[11px] text-[var(--text-muted)]">· Ingested from Gmail & Telegram</span>
+            </div>
+          </div>
+          <span class="text-xs text-[var(--text-muted)] font-mono">14 messages</span>
+        </div>
+
+        <!-- Message Stream (Slack Style + Apple Native Craft) -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+          
+          <!-- Message 1 -->
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+              SJ
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-baseline gap-2">
+                <span class="text-xs font-bold text-[var(--text-main)]">Sarah Jenkins</span>
+                <span class="text-[10px] text-[var(--text-muted)]">March 14, 2026 at 3:42 PM</span>
+                <span class="text-[10px] bg-blue-500/10 text-blue-500 px-1 rounded font-medium">Gmail</span>
+              </div>
+              <div class="text-xs text-[var(--text-main)] leading-relaxed">
+                Hey, I reviewed the proposal. The <strong>$12,500 total sounds fair with 40/30/30</strong>. Let's do $5k upfront so you can lock in the April development sprint. Once you send the invoice, finance will release within 48h.
+              </div>
+            </div>
+          </div>
+
+          <!-- Message 2 -->
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+              ME
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-baseline gap-2">
+                <span class="text-xs font-bold text-[var(--text-main)]">You</span>
+                <span class="text-[10px] text-[var(--text-muted)]">March 14, 2026 at 4:10 PM</span>
+              </div>
+              <div class="text-xs text-[var(--text-main)] leading-relaxed">
+                Awesome! Just emailed Invoice #104 for the $5,000 deposit over to billing. Excited to build this!
+              </div>
+            </div>
+          </div>
+
+          <!-- Message 3 -->
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+              AC
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-baseline gap-2">
+                <span class="text-xs font-bold text-[var(--text-main)]">Acme Finance</span>
+                <span class="text-[10px] text-[var(--text-muted)]">March 18, 2026 at 10:15 AM</span>
+                <span class="text-[10px] bg-emerald-500/10 text-emerald-500 px-1 rounded font-medium">Wire Transfer</span>
+              </div>
+              <div class="text-xs text-[var(--text-main)] leading-relaxed">
+                Wire transfer for $5,000.00 (Invoice #104) has been processed. Confirmation: WT-90812.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Chat Input Bar at Bottom (Slack Style) -->
+        <div class="p-4 border-t border-[var(--border-color)] bg-[var(--sidebar-bg)] macos-blur">
+          <div class="relative">
+            <input 
+              type="text" 
+              placeholder="Ask a question about #agreements or send a note..." 
+              class="w-full bg-[var(--main-bg)] border border-[var(--border-color)] rounded-xl px-4 py-2.5 text-xs text-[var(--text-main)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)]"
+            />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PAGE 3: STUDIO NOTEBOOK (Craft/Document View) -->
+      <!-- ============================================== -->
+      <div id="page-studio" class="page-view hidden flex-1 flex flex-col overflow-y-auto p-12 max-w-2xl mx-auto w-full space-y-6">
+        <div class="text-xs text-[var(--text-muted)]">Studio Note · Last updated Mar 18, 2026</div>
+        <h1 class="text-2xl font-bold tracking-tight text-[var(--text-main)]">Redesign Project Specification</h1>
+        
+        <div class="text-[15px] leading-relaxed text-[var(--text-main)] space-y-4 font-normal">
+          <p>
+            Synthesized across Sarah Jenkins email thread and Acme finance records.
+          </p>
+
+          <div class="p-4 rounded-xl border border-[var(--border-color)] bg-black/[0.02] dark:bg-white/[0.02] space-y-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Contract Milestones</h3>
+            <ul class="list-disc list-inside space-y-1 text-xs text-[var(--text-main)]">
+              <li><strong>Kickoff Deposit (40%):</strong> $5,000 — <span class="text-emerald-500 font-medium">Paid Mar 18</span></li>
+              <li><strong>Interactive Demo (30%):</strong> $3,750 — Due Apr 15</li>
+              <li><strong>Final Code Transfer (30%):</strong> $3,750 — Due Apr 30</li>
+            </ul>
+          </div>
+
+          <p class="text-xs text-[var(--text-muted)]">
+            All correspondence and payment confirmations have been verified and encrypted in the local vault.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PAGE 4: DATA CONNECTORS & SOURCES             -->
+      <!-- ============================================== -->
+      <div id="page-connectors" class="page-view hidden flex-1 flex flex-col overflow-y-auto p-8 max-w-3xl mx-auto w-full space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-[var(--text-main)]">Data Sources & Connectors</h2>
+          <p class="text-xs text-[var(--text-muted)]">Manage what is synced into your offline local vault.</p>
+        </div>
+
+        <div class="space-y-3">
+          <!-- Connector 1 -->
+          <div class="p-4 rounded-xl border border-[var(--border-color)] flex items-center justify-between bg-black/[0.01] dark:bg-white/[0.01]">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold text-sm">
+                M
+              </div>
+              <div>
+                <h4 class="text-xs font-semibold text-[var(--text-main)]">Google Gmail</h4>
+                <p class="text-[11px] text-[var(--text-muted)]">Read-only OAuth · 10,420 emails synced</p>
+              </div>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 font-medium border border-emerald-500/20">Connected</span>
+          </div>
+
+          <!-- Connector 2 -->
+          <div class="p-4 rounded-xl border border-[var(--border-color)] flex items-center justify-between bg-black/[0.01] dark:bg-white/[0.01]">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center font-bold text-sm">
+                O
+              </div>
+              <div>
+                <h4 class="text-xs font-semibold text-[var(--text-main)]">Obsidian Vault</h4>
+                <p class="text-[11px] text-[var(--text-muted)]">Local Folder Watcher · 2,840 Markdown files</p>
+              </div>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 font-medium border border-emerald-500/20">Watching</span>
+          </div>
+
+          <!-- Connector 3 -->
+          <div class="p-4 rounded-xl border border-[var(--border-color)] flex items-center justify-between bg-black/[0.01] dark:bg-white/[0.01]">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center font-bold text-sm">
+                T
+              </div>
+              <div>
+                <h4 class="text-xs font-semibold text-[var(--text-main)]">Telegram Export</h4>
+                <p class="text-[11px] text-[var(--text-muted)]">Consented JSON/ZIP Archive · 1,020 messages</p>
+              </div>
+            </div>
+            <button class="text-xs bg-[var(--accent)] text-white px-3 py-1 rounded-md font-medium hover:opacity-90">Import Zip</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- PAGE 5: PRIVACY & ZERO-KNOWLEDGE AUDIT        -->
+      <!-- ============================================== -->
+      <div id="page-privacy" class="page-view hidden flex-1 flex flex-col overflow-y-auto p-8 max-w-3xl mx-auto w-full space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-[var(--text-main)]">Privacy & Cryptographic Vault</h2>
+          <p class="text-xs text-[var(--text-muted)]">100% On-device encryption and deterministic PII sanitization.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl border border-[var(--border-color)] space-y-1">
+            <span class="text-[11px] uppercase font-mono text-[var(--text-muted)]">Encryption at Rest</span>
+            <div class="text-sm font-bold text-emerald-500">AES-256-GCM Active</div>
+            <p class="text-[11px] text-[var(--text-muted)]">Keys derived via Argon2id. Stored securely in macOS Keychain.</p>
+          </div>
+
+          <div class="p-4 rounded-xl border border-[var(--border-color)] space-y-1">
+            <span class="text-[11px] uppercase font-mono text-[var(--text-muted)]">Local PII Redactions</span>
+            <div class="text-sm font-bold text-[var(--text-main)]">27 Entities Scrubbed</div>
+            <p class="text-[11px] text-[var(--text-muted)]">Bank routing digits, SSNs, and passwords never enter chunk embeddings.</p>
+          </div>
+        </div>
+
+        <div class="border border-[var(--border-color)] rounded-xl p-4 space-y-3">
+          <h4 class="text-xs font-bold text-[var(--text-main)]">Recent Local Redaction Audit Log</h4>
+          <div class="space-y-2 text-xs font-mono text-[var(--text-muted)]">
+            <div class="flex justify-between border-b border-[var(--border-color)] pb-1.5">
+              <span>Sarah Jenkins Email (Mar 14)</span>
+              <span class="text-rose-500 font-semibold">[Phone Number Scrubbed]</span>
+            </div>
+            <div class="flex justify-between border-b border-[var(--border-color)] pb-1.5">
+              <span>Invoice #104 Acme (Mar 18)</span>
+              <span class="text-rose-500 font-semibold">[Routing Number Scrubbed]</span>
+            </div>
+            <div class="flex justify-between">
+              <span>AWS Credentials Email (Feb 02)</span>
+              <span class="text-rose-500 font-semibold">[Secret Key Scrubbed]</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <script>
+    function navigateTo(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+      // Show selected page
+      const target = document.getElementById(pageId);
+      if (target) target.classList.remove('hidden');
+
+      // Update rail highlights
+      const railButtons = {
+        'page-search': 'rail-search',
+        'page-channels': 'rail-channels',
+        'page-studio': 'rail-studio',
+        'page-connectors': 'rail-connectors',
+        'page-privacy': 'rail-privacy'
+      };
+
+      document.querySelectorAll('nav button').forEach(b => {
+        b.classList.remove('active-rail-item');
+        b.classList.remove('text-white');
+        b.classList.add('text-zinc-400');
+      });
+
+      const activeBtnId = railButtons[pageId];
+      if (activeBtnId) {
+        const btn = document.getElementById(activeBtnId);
+        btn.classList.add('active-rail-item');
+        btn.classList.add('text-white');
+        btn.classList.remove('text-zinc-400');
+      }
+    }
+  </script>
+</body>
+</html>

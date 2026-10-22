@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context Vault — Calm Personal Archive</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #faf9f5; /* Warm natural paper */
+      color: #1a1a18;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-serif-editorial {
+      font-family: 'Newsreader', serif;
+    }
+    .paper-card {
+      background-color: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center">
+
+  <!-- Top Minimal Bar -->
+  <header class="w-full max-w-3xl px-6 py-8 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-7 h-7 rounded-full bg-[#1a1a18] text-[#faf9f5] flex items-center justify-center font-serif-editorial text-sm font-semibold">
+        v
+      </div>
+      <span class="font-medium text-sm tracking-tight text-[#1a1a18]">Vault</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs text-[#706f6a]">
+      <a href="#" class="hover:text-[#1a1a18] transition-colors">Library</a>
+      <a href="#" class="hover:text-[#1a1a18] transition-colors">Sources</a>
+      <a href="#" class="hover:text-[#1a1a18] transition-colors">Settings</a>
+      <span class="text-[#e2e0d8]">|</span>
+      <span class="text-[#706f6a]">Private on Mac</span>
+    </div>
+  </header>
+
+  <!-- Main Human Experience -->
+  <main class="w-full max-w-2xl px-6 pb-24 flex-1 flex flex-col justify-center">
+
+    <!-- The Quiet Search Input -->
+    <div class="mb-10">
+      <div class="relative">
+        <input 
+          type="text" 
+          value="What did Sarah and I agree on for the redesign?" 
+          class="w-full bg-white border border-[#e2e0d8] rounded-2xl px-5 py-4 text-base text-[#1a1a18] placeholder-[#a09e96] shadow-sm focus:outline-none focus:border-[#706f6a] transition-all"
+        />
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-[#a09e96]">
+          <span class="bg-[#f2f0e8] px-2 py-0.5 rounded text-[11px] font-medium text-[#706f6a]">Return ↵</span>
+        </div>
+      </div>
+      <div class="mt-2.5 px-2 flex items-center gap-3 text-xs text-[#a09e96]">
+        <span>Recent:</span>
+        <button class="hover:text-[#1a1a18] transition-colors underline decoration-[#e2e0d8] underline-offset-4">Tokyo flight confirmation</button>
+        <span>·</span>
+        <button class="hover:text-[#1a1a18] transition-colors underline decoration-[#e2e0d8] underline-offset-4">Apartment lease agreement</button>
+      </div>
+    </div>
+
+    <!-- The Calm Answer -->
+    <div class="space-y-6">
+
+      <!-- Plain English Synthesis -->
+      <article class="paper-card rounded-2xl p-7 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#f2f0e8] pb-3">
+          <span class="text-xs font-medium text-[#706f6a]">Memory synthesis</span>
+          <time class="text-xs text-[#a09e96]">March 14, 2026</time>
+        </div>
+
+        <div class="font-serif-editorial text-xl leading-relaxed text-[#1a1a18]">
+          You agreed on a total budget of <strong class="font-semibold">$12,500</strong>, broken into three milestones: 40% upfront ($5,000), 30% upon interactive prototype ($3,750), and the remaining 30% upon final handover.
+        </div>
+
+        <p class="text-sm leading-relaxed text-[#706f6a]">
+          Sarah confirmed receiving the initial deposit invoice four days later, and development was scheduled to kick off in April.
+        </p>
+      </article>
+
+      <!-- The Real Source Quote (Honest, Human, Not a Cockpit) -->
+      <div class="space-y-2.5">
+        <span class="text-xs font-medium uppercase tracking-wider text-[#a09e96] px-1">Original email</span>
+        
+        <div class="paper-card rounded-xl p-5 hover:border-[#d4d1c5] transition-all">
+          <div class="flex items-center justify-between text-xs text-[#706f6a] mb-2">
+            <span class="font-medium text-[#1a1a18]">Sarah Jenkins &lt;sarah@studio.com&gt;</span>
+            <span class="text-[#a09e96]">March 14, 2026 · 3:42 PM</span>
+          </div>
+
+          <blockquote class="text-sm text-[#3d3d3a] leading-relaxed border-l-2 border-[#1a1a18] pl-3.5 my-3 italic font-serif-editorial text-[16px]">
+            “The $12,500 total sounds fair with 40/30/30. Let's do $5k upfront so you can lock in the April development sprint.”
+          </blockquote>
+
+          <div class="flex items-center justify-between pt-2 border-t border-[#f2f0e8] text-xs text-[#706f6a]">
+            <span>Subject: SOW Agreement Final</span>
+            <button class="text-[#1a1a18] font-medium hover:underline">Open in Mail app ↗</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

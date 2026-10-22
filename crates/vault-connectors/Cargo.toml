@@ -1,0 +1,18 @@
+[package]
+name = "vault-connectors"
+version = "0.1.0"
+edition = "2021"
+description = "Ethical data connectors and archive parsers for Context Vault"
+
+[dependencies]
+vault-pii = { path = "../vault-pii" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "2.0"
+walkdir = "2.5"
+notify = "6.1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "blocking", "rustls-tls"] }
+
+[dev-dependencies]
+tempfile = "3.17"

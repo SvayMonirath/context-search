@@ -1,0 +1,30 @@
+[package]
+name = "context-vault-desktop"
+version = "2.0.0"
+description = "Context Vault - Sovereign Personal Memory Engine for macOS"
+edition = "2021"
+
+[lib]
+name = "context_vault_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-shell = "2"
+tauri-plugin-global-shortcut = "2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "6.0"
+walkdir = "2.5"
+rand = "0.8"
+
+vault-crypto = { path = "../crates/vault-crypto" }
+vault-pii = { path = "../crates/vault-pii" }
+vault-index = { path = "../crates/vault-index" }
+vault-connectors = { path = "../crates/vault-connectors" }
+notify = "6.1"

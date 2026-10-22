@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare the 3 Visual Models — Context Vault</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0e0f12;
+      color: #e4e4e7;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    }
+    .hud-shadow {
+      box-shadow: 0 30px 80px -15px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Interactive Model Switcher Header -->
+  <header class="h-16 bg-[#14161b] border-b border-white/[0.08] px-6 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-sm text-white">
+        CV
+      </div>
+      <div>
+        <h1 class="text-sm font-semibold text-white">Choose Your Product Model</h1>
+        <p class="text-xs text-zinc-400">Click a model to see how the app looks and feels</p>
+      </div>
+    </div>
+
+    <!-- 3 Big Choice Buttons -->
+    <div class="flex items-center gap-2 bg-[#0e0f12] p-1.5 rounded-xl border border-white/[0.08]">
+      <button id="btn-m1" onclick="showModel('m1')" class="px-4 py-2 rounded-lg text-xs font-semibold bg-white text-zinc-900 shadow transition-all">
+        1. Perplexity Style (Search Engine)
+      </button>
+      <button id="btn-m2" onclick="showModel('m2')" class="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all">
+        2. Raycast Style (Floating HUD)
+      </button>
+      <button id="btn-m3" onclick="showModel('m3')" class="px-4 py-2 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all">
+        3. NotebookLM Style (Studio)
+      </button>
+    </div>
+
+    <div class="text-xs text-emerald-400 font-mono flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      Interactive Preview
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- MODEL 1: PERPLEXITY STYLE (Personal AI Search Engine) -->
+  <!-- ========================================== -->
+  <section id="model-1" class="flex-1 flex flex-col items-center p-8 bg-[#0e0f12]">
+    <div class="w-full max-w-3xl space-y-6">
+
+      <!-- Search Input (Clean, Centered, Focused) -->
+      <div class="bg-[#181a20] border border-white/[0.1] rounded-2xl p-4 shadow-xl focus-within:border-blue-500 transition-all">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-blue-400 mt-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <div class="flex-1">
+            <input 
+              type="text" 
+              value="What did Sarah and I agree on for the redesign pricing and milestones?"
+              class="w-full bg-transparent text-sm text-white font-medium focus:outline-none"
+            />
+          </div>
+          <button class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition-colors">
+            Ask
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 mt-3 pt-3 border-t border-white/[0.06] text-xs text-zinc-400">
+          <span class="text-zinc-500">Searching across:</span>
+          <span class="bg-white/[0.06] px-2 py-0.5 rounded text-white text-2xs font-medium">Gmail (10.4k emails)</span>
+          <span class="bg-white/[0.06] px-2 py-0.5 rounded text-white text-2xs font-medium">Notes (2.8k files)</span>
+          <span class="bg-white/[0.06] px-2 py-0.5 rounded text-white text-2xs font-medium">Telegram</span>
+        </div>
+      </div>
+
+      <!-- Sources Section (Like Perplexity Source Cards) -->
+      <div>
+        <div class="flex items-center gap-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2.5">
+          <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Sources Used
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div class="p-3 bg-[#181a20] border border-white/[0.08] rounded-xl hover:border-white/[0.2] transition-colors cursor-pointer">
+            <div class="flex items-center justify-between text-2xs text-zinc-500 mb-1">
+              <span class="text-blue-400 font-medium">Gmail · 1</span>
+              <span>Mar 14</span>
+            </div>
+            <p class="text-xs font-medium text-white truncate">SOW Agreement Final</p>
+            <p class="text-2xs text-zinc-400 truncate mt-1">From: Sarah Jenkins</p>
+          </div>
+
+          <div class="p-3 bg-[#181a20] border border-white/[0.08] rounded-xl hover:border-white/[0.2] transition-colors cursor-pointer">
+            <div class="flex items-center justify-between text-2xs text-zinc-500 mb-1">
+              <span class="text-purple-400 font-medium">Notes · 2</span>
+              <span>Mar 18</span>
+            </div>
+            <p class="text-xs font-medium text-white truncate">Projects / Acme.md</p>
+            <p class="text-2xs text-zinc-400 truncate mt-1">Invoice #104 deposit wire</p>
+          </div>
+
+          <div class="p-3 bg-[#181a20] border border-white/[0.08] rounded-xl hover:border-white/[0.2] transition-colors cursor-pointer">
+            <div class="flex items-center justify-between text-2xs text-zinc-500 mb-1">
+              <span class="text-cyan-400 font-medium">Telegram · 3</span>
+              <span>Mar 15</span>
+            </div>
+            <p class="text-xs font-medium text-white truncate">Sarah Jenkins Chat</p>
+            <p class="text-2xs text-zinc-400 truncate mt-1">"Contract signed and sent..."</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Synthesized Answer with Inline Citations [1], [2] -->
+      <article class="p-6 bg-[#181a20] border border-white/[0.08] rounded-2xl shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-white">Answer</span>
+            <span class="text-2xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-mono">100% Private (Local SLM)</span>
+          </div>
+          <button class="text-xs text-zinc-400 hover:text-white flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Copy
+          </button>
+        </div>
+
+        <div class="text-sm leading-relaxed text-zinc-200 space-y-3">
+          <p>
+            You and Sarah Jenkins agreed on a total project fee of <strong>$12,500</strong> for the redesign <span class="bg-blue-500/20 text-blue-300 px-1 py-0.2 rounded text-2xs font-mono cursor-pointer">[1]</span>.
+          </p>
+          <p>
+            The payment and delivery were structured into three specific milestones:
+          </p>
+          <ul class="list-disc list-inside space-y-1.5 text-zinc-300 pl-1">
+            <li><strong>Deposit (40%):</strong> $5,000 due upfront to lock in the April sprint. Sarah confirmed the wire was initiated on March 18 <span class="bg-purple-500/20 text-purple-300 px-1 py-0.2 rounded text-2xs font-mono cursor-pointer">[2]</span>.</li>
+            <li><strong>Beta Prototype (30%):</strong> $3,750 due upon delivery of the interactive client prototype <span class="bg-blue-500/20 text-blue-300 px-1 py-0.2 rounded text-2xs font-mono cursor-pointer">[1]</span>.</li>
+            <li><strong>Final Handover (30%):</strong> $3,750 due upon source code merge and sign-off <span class="bg-cyan-500/20 text-cyan-300 px-1 py-0.2 rounded text-2xs font-mono cursor-pointer">[3]</span>.</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Follow-up Question Bar -->
+      <div class="relative">
+        <input 
+          type="text" 
+          placeholder="Ask a follow-up question (e.g., 'Draft a follow-up email to Sarah about milestone 2')..." 
+          class="w-full bg-[#181a20] border border-white/[0.08] rounded-xl px-4 py-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+        />
+        <button class="absolute right-3 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white text-xs px-2.5 py-1 rounded font-medium">
+          Send
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- MODEL 2: RAYCAST STYLE (Floating Compact HUD) -->
+  <!-- ========================================== -->
+  <section id="model-2" class="hidden flex-1 flex items-center justify-center p-8 bg-[#08090b] relative">
+    <!-- Blurred Mock Desktop in Background -->
+    <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none"></div>
+
+    <!-- Centered Floating Raycast Window -->
+    <div class="w-full max-w-xl bg-[#16181d] border border-white/[0.12] rounded-2xl hud-shadow overflow-hidden flex flex-col relative z-10">
+      
+      <!-- Search Input Header -->
+      <div class="p-4 border-b border-white/[0.08] flex items-center gap-3 bg-[#1a1d24]">
+        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input 
+          type="text" 
+          value="Sarah redesign price" 
+          class="flex-1 bg-transparent text-sm text-white font-medium focus:outline-none"
+        />
+        <div class="flex items-center gap-1.5 text-2xs font-mono text-zinc-400 bg-white/[0.06] px-2 py-0.5 rounded">
+          <span>⌘K</span>
+        </div>
+      </div>
+
+      <!-- Quick AI Summary Card -->
+      <div class="m-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+        <div class="flex items-center justify-between text-2xs text-blue-300 font-medium mb-1">
+          <span>AI Recall Answer</span>
+          <span class="text-zinc-400 font-mono">100% on-device</span>
+        </div>
+        <p class="text-xs text-white leading-relaxed">
+          Agreed on <strong>$12,500 total</strong> (40% deposit of $5,000 paid March 18, 30% prototype, 30% handover).
+        </p>
+      </div>
+
+      <!-- Results List -->
+      <div class="px-2 pb-2 space-y-1 max-h-72 overflow-y-auto">
+        <div class="p-2.5 rounded-lg bg-white/[0.08] border border-white/[0.06] flex items-center justify-between cursor-pointer">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">G</span>
+            <div>
+              <p class="text-xs font-medium text-white">SOW Agreement Final - Redesign Budget</p>
+              <p class="text-2xs text-zinc-400">Sarah Jenkins · "The $12,500 total sounds fair..."</p>
+            </div>
+          </div>
+          <span class="text-2xs font-mono text-zinc-400 bg-white/10 px-1.5 py-0.5 rounded">↵ Copy</span>
+        </div>
+
+        <div class="p-2.5 rounded-lg hover:bg-white/[0.03] flex items-center justify-between cursor-pointer transition-colors">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold">N</span>
+            <div>
+              <p class="text-xs font-medium text-zinc-200">Projects / Acme.md</p>
+              <p class="text-2xs text-zinc-400">Obsidian · Invoice #104 ($5,000 deposit) paid</p>
+            </div>
+          </div>
+          <span class="text-2xs font-mono text-zinc-500">Open</span>
+        </div>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="px-4 py-2.5 bg-[#121317] border-t border-white/[0.08] flex items-center justify-between text-2xs font-mono text-zinc-400">
+        <div class="flex items-center gap-3">
+          <span><kbd class="bg-white/10 px-1.5 py-0.5 rounded text-white">↵</kbd> Copy Answer</span>
+          <span><kbd class="bg-white/10 px-1.5 py-0.5 rounded text-white">⌘ ↵</kbd> Open Original</span>
+          <span><kbd class="bg-white/10 px-1.5 py-0.5 rounded text-white">esc</kbd> Close</span>
+        </div>
+        <span class="text-emerald-400">● Encrypted</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- MODEL 3: NOTEBOOKLM STYLE (Research Studio) -->
+  <!-- ========================================== -->
+  <section id="model-3" class="hidden flex-1 flex overflow-hidden bg-[#0e0f12]">
+    
+    <!-- Left Column: Sources Shelf -->
+    <aside class="w-72 border-r border-white/[0.08] bg-[#14161b] p-4 flex flex-col justify-between">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider">Sources (3 Selected)</h3>
+          <button class="text-2xs text-blue-400 hover:underline">+ Add Source</button>
+        </div>
+
+        <div class="space-y-2">
+          <div class="p-2.5 rounded-lg bg-white/[0.05] border border-white/[0.08]">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" checked class="rounded border-zinc-700 bg-zinc-800 text-blue-600">
+              <span class="text-xs font-medium text-white truncate">Gmail: Sarah Jenkins Thread</span>
+            </div>
+            <p class="text-2xs text-zinc-400 pl-5 mt-1">4 emails · March 2026</p>
+          </div>
+
+          <div class="p-2.5 rounded-lg bg-white/[0.05] border border-white/[0.08]">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" checked class="rounded border-zinc-700 bg-zinc-800 text-blue-600">
+              <span class="text-xs font-medium text-white truncate">Note: Projects/Acme.md</span>
+            </div>
+            <p class="text-2xs text-zinc-400 pl-5 mt-1">Obsidian vault · 12 kB</p>
+          </div>
+
+          <div class="p-2.5 rounded-lg bg-white/[0.05] border border-white/[0.08]">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" checked class="rounded border-zinc-700 bg-zinc-800 text-blue-600">
+              <span class="text-xs font-medium text-white truncate">Telegram: Sarah Chat History</span>
+            </div>
+            <p class="text-2xs text-zinc-400 pl-5 mt-1">Chat export · 34 messages</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] text-2xs text-zinc-400">
+        <span>Total Context: <strong>48,200 tokens</strong></span><br>
+        <span>Index: <strong>100% on-device</strong></span>
+      </div>
+    </aside>
+
+    <!-- Center/Right: Studio Chat & Synthesis Canvas -->
+    <main class="flex-1 flex flex-col bg-[#0e0f12]">
+      <!-- Chat Transcript Area -->
+      <div class="flex-1 overflow-y-auto p-8 max-w-3xl mx-auto w-full space-y-6">
+        <!-- User Query -->
+        <div class="flex justify-end">
+          <div class="bg-blue-600 text-white rounded-2xl px-4 py-2.5 text-xs font-medium max-w-md shadow-sm">
+            What did Sarah and I agree on for the redesign pricing and milestones?
+          </div>
+        </div>
+
+        <!-- AI Studio Answer -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-2 text-2xs text-zinc-400 font-mono">
+            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            <span>Synthesizer · Based on 3 checked sources</span>
+          </div>
+
+          <div class="p-6 bg-[#181a20] border border-white/[0.08] rounded-2xl text-xs leading-relaxed text-zinc-200 space-y-3">
+            <p>
+              Across your email thread and notes, the agreed project fee is <strong>$12,500 USD</strong>.
+            </p>
+            <p>
+              The milestones are documented as follows:
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-zinc-300">
+              <li><strong>40% Upfront ($5,000):</strong> Deposit wire confirmed on March 18.</li>
+              <li><strong>30% Prototype ($3,750):</strong> Due on interactive demo sign-off.</li>
+              <li><strong>30% Final ($3,750):</strong> Due on code repository transfer.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Studio Input Bar at Bottom -->
+      <div class="p-4 border-t border-white/[0.08] bg-[#14161b]">
+        <div class="max-w-3xl mx-auto relative">
+          <input 
+            type="text" 
+            placeholder="Ask anything about the selected sources, or generate a timeline..." 
+            class="w-full bg-[#181a20] border border-white/[0.1] rounded-xl px-4 py-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+      </div>
+    </main>
+
+  </section>
+
+  <script>
+    function showModel(id) {
+      document.getElementById('model-1').classList.add('hidden');
+      document.getElementById('model-2').classList.add('hidden');
+      document.getElementById('model-3').classList.add('hidden');
+
+      document.getElementById('btn-m1').className = 'px-4 py-2 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all';
+      document.getElementById('btn-m2').className = 'px-4 py-2 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all';
+      document.getElementById('btn-m3').className = 'px-4 py-2 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all';
+
+      if (id === 'm1') {
+        document.getElementById('model-1').classList.remove('hidden');
+        document.getElementById('btn-m1').className = 'px-4 py-2 rounded-lg text-xs font-semibold bg-white text-zinc-900 shadow transition-all';
+      } else if (id === 'm2') {
+        document.getElementById('model-2').classList.remove('hidden');
+        document.getElementById('btn-m2').className = 'px-4 py-2 rounded-lg text-xs font-semibold bg-white text-zinc-900 shadow transition-all';
+      } else if (id === 'm3') {
+        document.getElementById('model-3').classList.remove('hidden');
+        document.getElementById('btn-m3').className = 'px-4 py-2 rounded-lg text-xs font-semibold bg-white text-zinc-900 shadow transition-all';
+      }
+    }
+  </script>
+</body>
+</html>

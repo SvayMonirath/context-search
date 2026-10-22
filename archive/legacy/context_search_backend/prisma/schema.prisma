@@ -1,0 +1,236 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id String @id @default(cuid())
+  username String @unique
+  email String @unique
+  hash_password String
+  encrypted_data_key String
+
+  created_at DateTime @default(now())
+
+  profiles Profile[]
+}
+
+enum ProfileType {
+  STANDARD
+  STATELESS
+}
+
+enum ProfileColors {
+  BLUE
+  CYAN
+  GREEN
+  ORANGE
+  RED
+  PURPLE
+}
+
+model Profile {
+  id String @id @default(cuid())
+  name String @unique
+  user_id String
+  type ProfileType @default(STANDARD)
+  color ProfileColors @default(BLUE)
+
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+
+  integrations Integration[]
+  communications Communication[]
+  searches SearchHistory[]
+  chats Chat[]
+  memoryRules MemoryRule[]
+  memoryLog MemoryLog[]
+}
+
+enum IntegrationType {
+  GMAIL
+  TELEGRAM
+}
+
+enum SyncStatus {
+  IDLE
+  SYNCING
+  SUCCESS
+  FAILED
+}
+
+model Integration {
+  id String @id @default(cuid())
+
+  profileID String
+  profile Profile @relation(fields: [profileID], references: [id], onDelete: Cascade)
+
+  communications Communication[]
+  isActive Boolean @default(true)
+
+  type IntegrationType
+
+  accessToken String?
+  refreshToken String?
+
+  syncStatus SyncStatus @default(IDLE)
+  lastSyncedAt DateTime?
+
+  gmailHistoryId String?
+
+  metadata Json?
+
+  created_at DateTime @default(now())
+}
+
+enum CommunicationType {
+  EMAIL
+  TELEGRAM_MESSAGE
+}
+
+model Communication {
+  id String @id @default(cuid())
+
+  profileID String
+  profile Profile @relation(fields: [profileID], references: [id], onDelete: Cascade)
+
+  integrationID String
+  integration Integration @relation(fields: [integrationID], references: [id], onDelete: Cascade)
+
+  type CommunicationType
+
+  externalID String?
+
+  sender String
+  content String
+  metadata Json?
+
+  sent_at DateTime
+  isDeleted Boolean @default(false)
+
+  created_at DateTime @default(now())
+
+  chunks CommunicationChunk[]
+
+  @@unique([integrationID, externalID])
+}
+
+model CommunicationChunk {
+  id String @id @default(cuid())
+
+  communicationID String
+  communication Communication @relation(fields: [communicationID], references: [id], onDelete: Cascade)
+
+  chunkIndex Int
+  content String
+
+  embedding Embedding?
+
+  created_at DateTime @default(now())
+
+  @@unique([communicationID, chunkIndex])
+}
+
+enum VectorModel {
+  openai
+  local_minilm
+}
+
+model Embedding {
+  id String @id @default(cuid())
+
+  chunkID String @unique
+  chunk CommunicationChunk @relation(fields: [chunkID], references: [id], onDelete: Cascade)
+
+  vector Unsupported("vector(384)")
+
+  model VectorModel
+
+  created_at DateTime @default(now())
+}
+
+model Chat {
+  id String @id @default(cuid())
+
+  title String
+
+  profileID String
+  profile Profile @relation(fields: [profileID], references: [id], onDelete: Cascade)
+
+  searches SearchHistory[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model SearchHistory {
+  id String @id @default(cuid())
+
+  profileID String
+  profile Profile @relation(fields: [profileID], references: [id], onDelete: Cascade)
+
+  chatID String?
+  chat Chat? @relation(fields: [chatID], references: [id], onDelete: Cascade)
+
+  query String
+  response String
+  results Json
+
+  created_at DateTime @default(now())
+}
+
+enum MemoryRuleType {
+  BLOCK_SENDER
+  BLOCK_CHAT
+  BLOCK_INTEGRATION
+  BLOCK_KEYWORD
+}
+enum MemoryScope {
+  INGESTION
+  RETRIEVAL
+  BOTH
+}
+model MemoryRule {
+  id String @id @default(cuid())
+  profileID String
+  profile Profile @relation(fields: [profileID], references: [id], onDelete: Cascade)
+
+  type MemoryRuleType
+  scope MemoryScope
+
+  value String[] // email, chat_id, sender, etc
+
+  isActive Boolean @default(true)
+
+  created_at DateTime @default(now())
+}
+
+enum LogAction {
+  BLOCKED
+  CANCELED
+  DELETED
+  HIDDEN
+}
+
+model MemoryLog {
+  id String @id @default(cuid())
+
+  profileID String
+  profile Profile @relation(fields: [profileID], references: [id], onDelete: Cascade)
+
+  targetType MemoryRuleType // communication | chunk | sender | integration
+  targetValue String
+
+  action LogAction
+
+  created_at DateTime @default(now())
+}
+

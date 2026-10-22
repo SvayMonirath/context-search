@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+dist/
+build/
+lib/
+out/
+*.tsbuildinfo
+
+# Prisma
+/src/generated/prisma/
+
+# Frameworks
+.next/
+.vite/
+.parcel-cache/
+
+# Cache
+.cache/
+.turbo/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Database
+*.sqlite
+*.db
+database_document.md
+
+# Security
+*.pem
+*.key
+*.crt
+
+# Temp
+*.tmp
+*.temp

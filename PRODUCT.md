@@ -4,11 +4,11 @@
 
 ## Platform
 
-web
+macOS Desktop (Tauri v2)
 
 ## Stack
 
-Tauri v2 (Rust backend), React 19, Vite, Tailwind CSS v4, shadcn/ui, LanceDB embedded, ONNX Runtime / Ollama.
+Tauri v2 (Rust backend), React 19, Vite, Tailwind CSS v4, AES-256-GCM, Argon2id, Embedded BM25 Inverted Index.
 
 ## Users
 
@@ -20,27 +20,27 @@ Provide an impenetrable, zero-knowledge personal memory vault that allows users 
 
 ## Positioning
 
-A 100% on-device, local-first intelligence vault. Unlike cloud-based personal AI tools (Rewind, Mem, Notion AI) that store unencrypted personal communications on remote servers, Context Vault guarantees zero plaintext leaves the user's hardware.
+A 100% on-device, local-first intelligence vault. Unlike cloud-based personal AI tools that store unencrypted personal communications on remote servers, Context Vault guarantees zero plaintext leaves the user's hardware.
 
 ## Operating Context
 
-- **Global Quick Recall (HUD)**: `Cmd+Space` hotkey overlay accessible from any app for sub-15ms factual lookup and citation copying.
-- **Deep Context Workspace**: Dedicated window for multi-source conversation, complex document synthesis, timeline filtering, and privacy audit logs.
-- **Local-Only Ingestion**: Background file watching and incremental Gmail/chat-archive ingestion without external daemons or Docker.
+- **Global Quick Recall (HUD)**: `Cmd+Shift+Space` (or `Cmd+Space`) system-wide hotkey overlay accessible from any app for sub-15ms factual lookup and citation copying.
+- **Deep Context Workspace**: Dedicated window for multi-source exploration, exact document inspection, source filtering, and privacy audit logs.
+- **Local-Only Ingestion**: Instant local folder scanning and chat/email import with automatic PII sanitization.
 
 ## Capabilities and Constraints
 
 - **Capabilities**:
-  - Embedded hybrid search (BM25 full-text + vector similarity + cross-encoder reranking).
-  - Conversational memory assistant with deterministic source quote attribution.
-  - Client-side AES-256-GCM authenticated encryption derived via Argon2id.
-  - Deterministic local PII scrubbing (financial, credential, third-party data).
-  - Dual AI inference (100% offline local SLM + optional BYOK cloud with pre-scrubbed context).
-  - Connectors: Read-only Gmail OAuth, local Markdown/Obsidian vaults, PDF/documents, Telegram/WhatsApp archive bundles.
+  - Embedded BM25 full-text search engine with term saturation (k1 = 1.2) and document length normalization (b = 0.75).
+  - Deterministic extractive evidence recall with exact quote and timestamp attribution.
+  - Client-side AES-256-GCM authenticated encryption derived via Argon2id with encrypted zero-knowledge verifier (`vault.verifier`), per-vault salt (`vault.salt`), and Master Passphrase setup and unlock screens.
+  - Deterministic local PII scrubbing (Luhn-checked credit cards, SSNs, API keys, phone numbers, bank routing).
+  - Connectors: Obsidian Markdown vault with live filesystem watching, Gmail incremental thread sync with REST API, Telegram Desktop JSON export ingestion with deduplication, and Notion workspace block hierarchy flattener.
+  - Authentic First-Run Experience (FRE): Fresh vaults boot with 0 records and interactive setup cards guiding source connection; zero synthetic mock data.
 - **Constraints**:
   - Zero external database daemons (no Docker, no PostgreSQL, no Redis).
-  - Zero unencrypted communication text written to disk.
-  - Minimal background CPU and battery consumption on laptops.
+  - Zero unencrypted communication text or plaintext passphrases written to disk.
+  - 100% on-device local processing.
 
 ## Brand Commitments
 
