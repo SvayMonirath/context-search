@@ -1,4 +1,4 @@
-# Context Vault
+# Context Search
 
 > Sovereign, 100% on-device desktop memory search engine for macOS. Indexes communications and notes across Obsidian, Gmail, Telegram, and Notion with hardware-accelerated AES-256-GCM encryption, Argon2id key derivation, and automated PII scrubbing.
 
@@ -193,12 +193,6 @@ Verify the frontend TypeScript build:
 pnpm --prefix ui build
 ```
 
-Run the visual design taste linter:
-
-```bash
-node ~/.gemini/config/skills/design-taste-frontend/scripts/lint.mjs ui/src/App.tsx
-```
-
 ---
 
 ## Security Policy
@@ -207,9 +201,3 @@ node ~/.gemini/config/skills/design-taste-frontend/scripts/lint.mjs ui/src/App.t
 * Encrypted vaults default to POSIX permissions `0600` (owner read/write only).
 * PII scrubbing is applied synchronously before plaintext hits memory indexing structures.
 * Continuous auto-sync intervals run strictly against localhost network sockets or user-authorized API endpoints.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
